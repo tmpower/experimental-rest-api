@@ -1,0 +1,24 @@
+1. use postgres for db
+2. games, tags, platforms, ratings, creators
+4. Response class for api
+5. productschema of marshmellow for data serialization
+6. token based authentication
+7. rate limiting (use redis)
+8. login_required for protecting resources 
+9. 429 err code for too many requests
+10. what is 400 for. POST /api/moives/<id> ans:bad request
+12. finally test the api
+
+blueprint, sqlalchemy, flask_restful, api, resources, itsdangerous, OAuth2.0, marshmellow
+
+GET     /api/movies/        returns 200 # list all movies
+POST    /api/movies/        returns 201 # create a movie
+GET     /api/movies/<id>    returns 200 # show a specific movie
+PUT     /api/movies/<id>    returns 201 # update a movie
+DELETE  /api/movies/<id>    returns 204 # delete a movie
+
+/profiles/{profileName}
+/messages/{messageId}
+
+/creators/{creator_id}/games
+/categories/{category_id}/games
