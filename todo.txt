@@ -1,5 +1,5 @@
 1. use postgres for db
-2. games, tags, platforms, ratings, creators
+2. games, tags, categories (genres), platforms, ratings, creators
 4. Response class for api
 5. productschema of marshmellow for data serialization
 6. token based authentication
@@ -20,5 +20,6 @@ DELETE  /api/movies/<id>    returns 204 # delete a movie
 /profiles/{profileName}
 /messages/{messageId}
 
+/games/{game_id}/platforms
 /creators/{creator_id}/games
 /categories/{category_id}/games

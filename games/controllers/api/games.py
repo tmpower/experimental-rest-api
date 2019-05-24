@@ -15,7 +15,7 @@ class GamesAPI(Resource):
         if game_id:
             abort(400)
         else:
-            # abort_if_no_admin_auth(token)
+            # abort_if_no_admin_auth(token) // extract token from url
 
             new_game = Game()
             db.session.add(new_game)
