@@ -1,5 +1,6 @@
 1. use postgres for db
 2. games, tags, categories (genres), platforms, ratings, creators
+3. 206 code for partial content, aka pagination
 4. Response class for api
 5. productschema of marshmellow for data serialization
 6. token based authentication
