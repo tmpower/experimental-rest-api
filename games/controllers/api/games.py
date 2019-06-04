@@ -1,14 +1,14 @@
 from flask_restful import Resource
 from games.models import db, Game
-from flask import jsonify, abort
+from flask import jsonify, abort, json
 
 
 class GamesAPI(Resource):
     def get(self, game_id=None):
         if game_id:
-            return jsonify(Game.query.get_or_404(game_id).to_dict())
+            return jsonify(Game.query.get_or_404(game_id).to_json())
         else:
-            return jsonify(Game.query.all())
+            return jsonify([game.to_json() for game in Game.query.all()])
 
 
     def post(self, game_id=None):
