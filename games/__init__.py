@@ -1,33 +1,23 @@
 from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
 
-# import Blueprints here
-from games.controllers.main import main_blueprint
-
-# import APIs here
-from games.controllers.api import rest_api
-from games.controllers.api.games import GamesAPI
-# from games.controllers.api.categories import CategoriesAPI
+db = SQLAlchemy()
 
 
-def create_app():
+def create_app(config):
     app = Flask(__name__)
+    app.config.from_object(config) # load cofigurations from config.py
+    db.app = app
+    db.init_app(app)
 
-    # register your APIs here
-    rest_api.add_resource(
-        GamesAPI,
-        '/api/games',
-        '/api/games/<int:game_id>',
-    )
+    ## import Blueprints here
+    ## register your Blueprints here
+    from games.controllers.main import main_blueprint
+    app.register_blueprint(main_blueprint)
 
-    # rest_api.add_resource(
-    #     CategoriesAPI,
-    #     '/api/categories',
-    #     '/api/categories/<int:category_id>',
-    # )
-
+    ## import rest api here only once
+    ## register your resp_api here
+    from games.controllers.api import rest_api
     rest_api.init_app(app)
 
-    # register your Blueprints here
-    app.register_blueprint(main_blueprint)
-    
     return app
