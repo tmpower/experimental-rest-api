@@ -1,44 +1,49 @@
 from games import db
 
 
+categories = db.Table(
+    'game_categories',
+    db.Column('game_id', db.Integer, db.ForeignKey('game.id')),
+    db.Column('category_id', db.Integer, db.ForeignKey('category.id'))
+)
+
+
 class Game(db.Model):
     __tablename__ = "game"
+
     id = db.Column(db.Integer(), primary_key=True)
     title = db.Column(db.String())
 
     developer_id = db.Column(db.Integer(), db.ForeignKey('developer.id'))
 
-    category = db.Column(db.String())
+    categories = db.relationship('Category', secondary=categories, backref=db.backref('games', lazy='dynamic'), lazy='dynamic')
 
-
-    def __init__(self, title, category):
+    def __init__(self, title):
         self.title = title
-        self.category = category
 
     def to_json(self):
-        json_post = {
+        json_game = {
             'title': self.title,
-            'category': self.category
+            # 'developer_id': self.developer_id
         }
-        return json_post
+        return json_game
 
 
 class Category(db.Model):
     __tablename__ = "category"
-    id = db.Column(db.Integer(), primary_key=True)
-    title = db.Column(db.String())
-    category = db.Column(db.String())
 
-    def __init__(self, title, game):
-        self.title = title
-        self.game = game
+    id = db.Column(db.Integer(), primary_key=True)
+    name = db.Column(db.String())
+
+    def __init__(self, name):
+        self.name = name
 
     def to_json(self):
-        json_post = {
-            'title': self.title,
-            'game': self.game
+        json_category = {
+            'name': self.name
+            # 'title': self.title,
         }
-        return json_post
+        return json_category
 
 
 class Developer(db.Model):
@@ -49,12 +54,12 @@ class Developer(db.Model):
 
     games = db.relationship('Game', backref='developer', lazy='dynamic')
 
-    def __init__(self, title, game):
-        self.name = title
+    def __init__(self, name):
+        self.name = name
 
     def to_json(self):
-        json_post = {
+        json_developer = {
             'name': self.name,
             # 'game': self.game
         }
-        return json_post
+        return json_developer
