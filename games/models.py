@@ -1,22 +1,37 @@
-from flask_sqlalchemy import SQLAlchemy
+from games import db
 
-db = SQLAlchemy()
 
 class Game(db.Model):
+    __tablename__ = "game"
     id = db.Column(db.Integer(), primary_key=True)
     title = db.Column(db.String())
-    publish_date = db.Column(db.DateTime())
+    category = db.Column(db.String())
 
-    # category_id = db.Column(db.Integer(), db.ForeignKey('category.id'))
+    def __init__(self, title, category):
+        self.title = title
+        self.category = category
 
-    # comments = db.relationship(
-    #     'Comment',
-    #     backref='post',
-    #     lazy='dynamic'
-    # )
-    # tags = db.relationship(
-    #     'Tag',
-    #     secondary=tags,
-    #     backref=db.backref('posts', lazy='dynamic'),
-    #     lazy='dynamic'
-    # )
+    def to_json(self):
+        json_post = {
+            'title': self.title,
+            'category': self.category
+        }
+        return json_post
+
+
+class Category(db.Model):
+    __tablename__ = "category"
+    id = db.Column(db.Integer(), primary_key=True)
+    title = db.Column(db.String())
+    category = db.Column(db.String())
+
+    def __init__(self, title, game):
+        self.title = title
+        self.game = game
+
+    def to_json(self):
+        json_post = {
+            'title': self.title,
+            'game': self.game
+        }
+        return json_post
