@@ -1,4 +1,4 @@
-1. use postgres for db
+1. use postgres for db (DONE!!!)
 2. games, tags, categories (genres), platforms, ratings, creators
 3. 206 code for partial content, aka pagination
 4. Response class for api
@@ -7,7 +7,7 @@
 7. rate limiting (use redis), althought it could be done with nginx config
 8. login_required for protecting resources 
 9. 429 err code for too many requests
-10. what is 400 for. POST /api/moives/<id> ans:bad request
+10. what is 400 for. POST /api/moives/<id> ans:bad request (DONE!!!)
 11. authentication with google
 12. finally test the api
 
