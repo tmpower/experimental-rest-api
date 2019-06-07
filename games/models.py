@@ -21,12 +21,12 @@ class Game(db.Model):
     def __init__(self, title):
         self.title = title
 
-    def to_json(self):
-        json_game = {
-            'title': self.title,
-            # 'developer_id': self.developer_id
-        }
-        return json_game
+    # def to_json(self):
+    #     json_game = {
+    #         'title': self.title,
+    #         # 'developer_id': self.developer_id
+    #     }
+    #     return json_game
 
 
 class Category(db.Model):
@@ -37,13 +37,6 @@ class Category(db.Model):
 
     def __init__(self, name):
         self.name = name
-
-    def to_json(self):
-        json_category = {
-            'name': self.name
-            # 'title': self.title,
-        }
-        return json_category
 
 
 class Developer(db.Model):
@@ -56,10 +49,3 @@ class Developer(db.Model):
 
     def __init__(self, name):
         self.name = name
-
-    def to_json(self):
-        json_developer = {
-            'name': self.name,
-            # 'game': self.game
-        }
-        return json_developer
