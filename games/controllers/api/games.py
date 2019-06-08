@@ -19,7 +19,7 @@ class GamesAPI(Resource):
         super(GamesAPI, self).__init__()
 
     def get(self):
-        return jsonify([game.to_json() for game in Game.query.all()])
+        return jsonify( [ marshal(game, game_fields) for game in Game.query.all() ] )
 
     def post(self):
         # abort_if_no_admin_auth(token) // extract token from url
@@ -40,7 +40,8 @@ class GameAPI(Resource):
         super(GameAPI, self).__init__()
 
     def get(self, game_id):
-        return jsonify( marshal(Game.query.get_or_404(game_id), game_fields) )
+        game = Game.query.get_or_404(game_id)
+        return jsonify( marshal(game, game_fields) )
 
     def put(self, game_id):
         # abort_if_no_admin_auth(token)
