@@ -22,6 +22,6 @@ DELETE  /api/movies/<id>    returns 204 # delete a movie
 /profiles/{profileName}
 /messages/{messageId}
 
-/games/{game_id}/platforms
-/creators/{creator_id}/games
 /categories/{category_id}/games
+/games/{game_id}/categories
+/developer/{developer_id}/games

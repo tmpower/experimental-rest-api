@@ -19,15 +19,8 @@ class Game(db.Model):
 
     categories = db.relationship('Category', secondary=categories, backref=db.backref('games', lazy='dynamic'), lazy='dynamic')
 
-    def __init__(self, title):
+    def __init__(self, title, developer_id = 1, categories = []):
         self.title = title
-
-    # def to_json(self):
-    #     json_game = {
-    #         'title': self.title,
-    #         # 'developer_id': self.developer_id
-    #     }
-    #     return json_game
 
 
 class Category(db.Model):
@@ -48,7 +41,7 @@ class Developer(db.Model):
 
     games = db.relationship('Game', backref='developer', lazy='dynamic')
 
-    def __init__(self, name):
+    def __init__(self, name, games = []):
         self.name = name
 
 

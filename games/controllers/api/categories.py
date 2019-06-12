@@ -1,43 +1,55 @@
-from flask_restful import Resource
+from flask_restful import Resource, reqparse, marshal, fields
 from games.models import db, Category
-from flask import jsonify, abort
+from flask import jsonify, abort, json
 
+category_fields = {
+    'name': fields.String,
+    'uri': fields.Url('category')
+}
 
 class CategoriesAPI(Resource):
-    def get(self, category_id=None):
-        if category_id:
-            return jsonify(Category.query.get_or_404(category_id).to_dict())
-        else:
-            return jsonify(Category.query.all())
+    def __init__(self):
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument('name', type=str, required=True, help='No category title provided', location='json')
+        self.reqparse.add_argument('game_id', type=int, default=1, location='json')
+        super(CategoriesAPI, self).__init__()
+
+    def get(self):
+        categories = Category.query.all()
+        return jsonify( [ marshal(category, category_fields) for category in categories ] )
+
+    def post(self):
+        # abort_if_no_admin_auth(token) // extract token from url
+        args = self.reqparse.parse_args(strict=True)
+        new_category = Category(args['name'])
+        db.session.add(new_category)
+        db.session.commit()
+
+        return {"result" : new_category.id}, 201
 
 
-    def post(self, category_id=None):
-        if category_id:
-            abort(400)
-        else:
-            new_category = Category()
-            db.session.add(new_category)
-            db.session.commit()
+class CategoryAPI(Resource):
+    def __init__(self):
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument('name', type=str, location='json')
+        super(CategoryAPI, self).__init__()
 
-            return {"result" : new_category.id}, 201
+    def get(self, id):
+        category = Category.query.get_or_404(id)
+        return jsonify( marshal(category, category_fields) )
 
+    def put(self, id):
+        # abort_if_no_admin_auth(token)
+        category = Category.query.get_or_404(id)
+        # edit and update 'game' here..
+        db.session.commit()
 
-    def put(self, category_id=None):
-        if not category_id:
-            abort(400)
-        else:
-            category = Category.query.get_or_404(category_id)
-            db.session.commit()
+        return {"result" : category.id}, 201
 
-            return {"result" : category.id}, 201
+    def delete(self, id):
+        # abort_if_no_admin_auth(token)
+        category = Category.query.get_or_404(id)
+        db.session.delete(category)
+        db.session.commit()
 
-
-    def delete(self, category_id=None):
-        if not category_id:
-            abort(400)
-        else:
-            category = Category.query.get_or_404(category_id)
-            db.session.delete(category)
-            db.session.commit()
-
-            return "", 204
+        return "", 204
