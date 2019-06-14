@@ -6,8 +6,8 @@ from games.controllers.api.categories import category_fields
 
 game_fields = {
     'title': fields.String,
-    'developer': fields.String,
-    'categories': fields.Nested(category_fields),
+    'developer_id': fields.Integer,
+    'categories': fields.List(fields.Nested(category_fields)),
     'uri': fields.Url('game')
 }
 

@@ -1,9 +1,11 @@
 from flask_restful import Resource, reqparse, marshal, fields
 from games.models import db, Category
 from flask import jsonify, abort, json
+# from games.controllers.api.games import game_fields
 
 category_fields = {
     'name': fields.String,
+    # 'games': fields.List(fields.Nested(game_fields)),
     'uri': fields.Url('category')
 }
 
