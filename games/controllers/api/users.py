@@ -1,6 +1,6 @@
-from flask_restful import Resource, reqparse, marshal, fields
+from flask_restful import Resource, reqparse, fields, marshal_with
 from games.models import db, User
-from flask import jsonify, abort, json
+from flask import jsonify, abort
 
 
 user_fields = {
@@ -15,9 +15,9 @@ class UsersAPI(Resource):
         self.reqparse.add_argument('password', type=str, required=True, help='No password provided', location='json')
         super(UsersAPI, self).__init__()
 
+    @marshal_with(user_fields)
     def get(self):
-        users = User.query.all()
-        return jsonify( [ marshal(user, user_fields) for user in users ] )
+        return User.query.all()
 
     def post(self):
         # abort_if_no_admin_auth(token) // extract token from url
@@ -35,13 +35,13 @@ class UsersAPI(Resource):
 class UserAPI(Resource):
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument('username', type=str, location='json') # location='args'
+        self.reqparse.add_argument('username', type=str, location='json')
         self.reqparse.add_argument('password', type=str, location='json')
         super(UserAPI, self).__init__()
 
+    @marshal_with(user_fields)
     def get(self, id):
-        user = User.query.get_or_404(id)
-        return jsonify( marshal(user, user_fields) )
+        return User.query.get_or_404(id)
 
     def put(self, id):
         # abort_if_no_admin_auth(token)
