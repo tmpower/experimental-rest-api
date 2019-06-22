@@ -1,32 +1,31 @@
-from flask_restful import Resource, reqparse, marshal, fields
-from games.models import db, User
-from flask import jsonify, abort, json
-from flask_httpauth import HTTPBasicAuth
-from flask import g
-
-auth = HTTPBasicAuth()
+from flask_restful import Resource, reqparse
+from games.models import User
+from flask import jsonify, abort
 
 
-@auth.verify_password
-def verify_password(username_or_token, password):
-    user = User.verify_auth_token(username_or_token)
-    if not user:
-        user = User.query.filter_by(username = username_or_token).first()
+#pwd: password
+#token: eyJhbGciOiJIUzUxMiIsImlhdCI6MTU2MTIwMTY4OCwiZXhwIjoxNTYxMjAyMjg4fQ.eyJpZCI6MX0.asgQCSGrWJb64ULtAoEYQmM_-lyjIWdYGWcM_mY4bg-4v7bcxp9TCagI9hzzGh5P74IJBFrRJhP__Ox2bGNamA
+class TokenAPI(Resource):
+    def __init__(self):
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument('username', type=str, required=True, help='No username provided', location='json')
+        self.reqparse.add_argument('password', type=str, required=True, help='No password provided', location='json')
+        super(TokenAPI, self).__init__()
+    
+    def post(self):
+        args = self.reqparse.parse_args(strict=True)
+
+        username = args['username']
+        password = args['password']
+
+        user = User.query.filter_by(username = username).first()
         if not user or not user.verify_password(password):
-            return False
-    g.user = user
-    return True
+            abort(401)
 
-
-class AuthAPI(Resource):
-    def get(self):
-        token = g.generate_auth_token
+        token = user.generate_auth_token()
         return jsonify( {"token" : token.decode("ascii")} )
 
-
-class LoginApi(Resource):
-    def get(self):
-        pass
-    
-    def put(self):
-        pass
+def abort_if_no_auth(token):
+    user = User.verify_auth_token(token)
+    if user is None:
+        abort(401)
