@@ -1,28 +1,32 @@
-from flask_restful import Resource, reqparse, marshal, fields
+from flask_restful import Resource, reqparse, marshal_with, fields
 from games.models import db, Category
-from flask import jsonify, abort, json
-# from games.controllers.api.games import game_fields
+from flask import jsonify, abort
+from games.controllers.api.auth import abort_if_no_auth
+
 
 category_fields = {
     'name': fields.String,
-    # 'games': fields.List(fields.Nested(game_fields)),
     'uri': fields.Url('category')
+    # 'games': fields.List(fields.Nested(game_fields)),
 }
+
 
 class CategoriesAPI(Resource):
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('name', type=str, required=True, help='No category title provided', location='json')
         self.reqparse.add_argument('game_id', type=int, default=1, location='json')
+        self.reqparse.add_argument('token', type=str, location='json')
         super(CategoriesAPI, self).__init__()
 
+    @marshal_with(category_fields)
     def get(self):
-        categories = Category.query.all()
-        return jsonify( [ marshal(category, category_fields) for category in categories ] )
+        return Category.query.all()
 
     def post(self):
-        # abort_if_no_admin_auth(token) // extract token from url
         args = self.reqparse.parse_args(strict=True)
+        abort_if_no_auth(args['token'])
+
         new_category = Category(args['name'])
         db.session.add(new_category)
         db.session.commit()
@@ -34,22 +38,28 @@ class CategoryAPI(Resource):
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('name', type=str, location='json')
+        self.reqparse.add_argument('token', type=str, location='json')
         super(CategoryAPI, self).__init__()
 
+    @marshal_with(category_fields)
     def get(self, id):
-        category = Category.query.get_or_404(id)
-        return jsonify( marshal(category, category_fields) )
+        return Category.query.get_or_404(id)
 
     def put(self, id):
-        # abort_if_no_admin_auth(token)
+        args = self.reqparse.parse_args(strict=True)
+        abort_if_no_auth(args['token'])
+
         category = Category.query.get_or_404(id)
-        # edit and update 'game' here..
+        if args['name']:
+            category.name = args['name']
         db.session.commit()
 
         return {"result" : category.id}, 201
 
     def delete(self, id):
-        # abort_if_no_admin_auth(token)
+        args = self.reqparse.parse_args(strict=True)
+        abort_if_no_auth(args['token'])
+
         category = Category.query.get_or_404(id)
         db.session.delete(category)
         db.session.commit()

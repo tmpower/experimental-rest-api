@@ -1,5 +1,5 @@
 from flask import render_template, Blueprint, request, abort
-from games.models import Game, User, Category
+from games.models import Game, User, Category, Developer
 from games import db
 
 
@@ -8,26 +8,6 @@ main_blueprint = Blueprint(
     __name__,
     template_folder='../templates'
 )
-
-
-@main_blueprint.route('/users/<int:user_id>', methods = ['GET', 'PUT', 'POST', 'DELETE'])
-def users(user_id = None):
-    if request.method == 'POST':
-        if user_id is None:
-            username = request.json.get('username')
-            password = request.json.get('password')
-
-            if username is None or password is None:
-                abort(400) # empty fields
-            if User.query.filter_by(username = username).first() is not None:
-                abort(400) # existing username
-
-            user = User(username = username)
-            user.hash_password(password)
-            db.session.add(user)
-            db.session.commit()
-
-            return {"username" : user.username}, 201
 
 
 @main_blueprint.route("/put_games")
@@ -65,5 +45,22 @@ def put_categories():
 
 @main_blueprint.route("/get_categories")
 def get_categories():
-    categories = Category.query.all()
+    categories = Game.query.get(5).categories
     return render_template("index.html", categories = categories)
+
+@main_blueprint.route("/put_developers")
+def put_developers():
+    game5 = Game.query.get(2)
+
+    new_developer = Developer("EA")
+    new_developer.games.append(game5)
+
+    db.session.add(new_developer)
+    db.session.commit()
+
+    return "Developers Created!"
+
+@main_blueprint.route("/get_developers")
+def get_developers():
+    developers = Game.query.get(2).developer
+    return render_template("index.html", developers = developers)

@@ -14,5 +14,5 @@ from games.controllers.api.users import UserAPI, UsersAPI
 rest_api.add_resource( UserAPI, '/api/users/<int:id>', endpoint = 'user')
 rest_api.add_resource( UsersAPI, '/api/users', endpoint = 'users')
 
-from games.controllers.api.auth import AuthAPI
-rest_api.add_resource( AuthAPI, '/api/token', endpoint = 'token')
+from games.controllers.api.auth import TokenAPI
+rest_api.add_resource( TokenAPI, '/api/auth/token', endpoint = 'token')
