@@ -1,7 +1,7 @@
 from flask_restful import Resource, reqparse, marshal_with, fields
 from games.models import db, Category
 from flask import jsonify, abort
-from games.controllers.api.auth import abort_if_no_auth
+from games.utils import abort_if_no_auth
 
 
 category_fields = {

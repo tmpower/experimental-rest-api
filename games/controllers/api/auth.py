@@ -24,8 +24,3 @@ class TokenAPI(Resource):
 
         token = user.generate_auth_token()
         return jsonify( {"token" : token.decode("ascii")} )
-
-def abort_if_no_auth(token):
-    user = User.verify_auth_token(token)
-    if user is None:
-        abort(401)

@@ -1,7 +1,7 @@
 from flask_restful import Resource, reqparse, marshal_with, fields
 from games.models import db, Game
 from flask import jsonify, abort
-from games.controllers.api.auth import abort_if_no_auth
+from games.utils import abort_if_no_auth #, ratelimit
 from games.controllers.api.categories import category_fields
 
 
@@ -27,10 +27,11 @@ class GamesAPI(Resource):
         self.reqparse.add_argument('token', type=str, location='json')
         super(GamesAPI, self).__init__()
 
-    @marshal_with(game_fields)
+    @marshal_with(game_fields) # will need to switch back to marshal
     def get(self):
         return Game.query.all()
 
+    # @ratelimit(requests=100, window=60)
     def post(self):
         args = self.reqparse.parse_args(strict=True)
         abort_if_no_auth(args['token'])

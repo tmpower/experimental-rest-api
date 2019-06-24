@@ -4,7 +4,7 @@ from flask import abort
 # import redis
 # from flask import g
 
-# def limit(requests=100, window=60, by="ip", group=None):
+# def ratelimit(requests=100, window=60, by="ip", group=None):
 #     if not callable(by):
 #         by = { 'ip': lambda: request.headers.remote_addr }[by]
 
