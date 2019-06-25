@@ -6,7 +6,7 @@ from games.utils import abort_if_no_auth
 
 category_fields = {
     'name': fields.String,
-    'uri': fields.Url('category')
+    'uri': fields.Url('category_v2')
     # 'games': fields.List(fields.Nested(game_fields)),
 }
 

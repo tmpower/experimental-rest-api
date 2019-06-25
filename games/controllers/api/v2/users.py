@@ -5,7 +5,7 @@ from flask import jsonify, abort
 
 user_fields = {
     'username': fields.String,
-    'uri': fields.Url('user')
+    'uri': fields.Url('user_v2')
 }
 
 class UsersAPI(Resource):

@@ -14,7 +14,7 @@ game_fields = {
     'title': fields.String,
     'developer': fields.Nested(developer_fields),
     'categories': fields.List(fields.Nested(category_fields)),
-    'uri': fields.Url('game')
+    'uri': fields.Url('game_v1')
 }
 
 
@@ -31,7 +31,7 @@ class GamesAPI(Resource):
     def get(self):
         return Game.query.all()
 
-    # @ratelimit(requests=100, window=60)
+    # @ratelimit(limit=100, interval=60, shared_limit=True)
     def post(self):
         args = self.reqparse.parse_args(strict=True)
         abort_if_no_auth(args['token'])

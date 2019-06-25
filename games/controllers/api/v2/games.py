@@ -14,7 +14,7 @@ game_fields = {
     'title': fields.String,
     'developer': fields.Nested(developer_fields),
     'categories': fields.List(fields.Nested(category_fields)),
-    'uri': fields.Url('game')
+    'uri': fields.Url('game_v2')
 }
 
 
