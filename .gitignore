@@ -20,3 +20,4 @@ __pycache__
 restenv
 .DS_Store
 settings.json
+restapi.db

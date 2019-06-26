@@ -1,7 +1,7 @@
-from flask_restful import Resource, reqparse, marshal_with, fields
+from flask_restful import Resource, reqparse, marshal, fields
 from games.models import db, Category
 from flask import jsonify, abort
-from games.utils import abort_if_no_auth
+from games.utils import abort_if_no_auth, ratelimit
 
 
 category_fields = {
@@ -19,10 +19,11 @@ class CategoriesAPI(Resource):
         self.reqparse.add_argument('token', type=str, location='json')
         super(CategoriesAPI, self).__init__()
 
-    @marshal_with(category_fields)
+    @ratelimit(request_limit = 100, time_interval = 300)
     def get(self):
-        return Category.query.all()
+        return jsonify( [ marshal(category, category_fields) for category in Category.query.all() ] )
 
+    @ratelimit(request_limit = 100, time_interval = 300)
     def post(self):
         args = self.reqparse.parse_args(strict=True)
         abort_if_no_auth(args['token'])
@@ -41,10 +42,11 @@ class CategoryAPI(Resource):
         self.reqparse.add_argument('token', type=str, location='json')
         super(CategoryAPI, self).__init__()
 
-    @marshal_with(category_fields)
+    @ratelimit(request_limit = 100, time_interval = 300)
     def get(self, id):
-        return Category.query.get_or_404(id)
+        return jsonify( marshal(Category.query.get_or_404(id), category_fields) )
 
+    @ratelimit(request_limit = 100, time_interval = 300)
     def put(self, id):
         args = self.reqparse.parse_args(strict=True)
         abort_if_no_auth(args['token'])
@@ -56,6 +58,7 @@ class CategoryAPI(Resource):
 
         return {"result" : category.id}, 201
 
+    @ratelimit(request_limit = 100, time_interval = 300)
     def delete(self, id):
         args = self.reqparse.parse_args(strict=True)
         abort_if_no_auth(args['token'])

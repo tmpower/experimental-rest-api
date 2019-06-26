@@ -1,6 +1,7 @@
 from flask import render_template, Blueprint, request, abort
 from games.models import Game, User, Category, Developer
 from games import db
+from games.utils import ratelimit
 
 
 main_blueprint = Blueprint(
@@ -64,3 +65,15 @@ def put_developers():
 def get_developers():
     developers = Game.query.get(2).developer
     return render_template("index.html", developers = developers)
+
+
+@main_blueprint.route("/limited_endpoint1")
+@ratelimit(request_limit = 5, time_interval = 20)
+def limited1():
+    return "Limited Link-1"
+
+
+@main_blueprint.route("/limited_endpoint2")
+@ratelimit(request_limit = 5, time_interval = 20)
+def limited2():
+    return "Limited Link-2"

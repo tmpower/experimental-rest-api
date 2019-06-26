@@ -1,7 +1,7 @@
-from flask_restful import Resource, reqparse, marshal_with, fields
+from flask_restful import Resource, reqparse, marshal, fields
 from games.models import db, Game
 from flask import jsonify, abort
-from games.utils import abort_if_no_auth #, ratelimit
+from games.utils import abort_if_no_auth, ratelimit
 from games.controllers.api.v1.categories import category_fields
 
 
@@ -27,11 +27,11 @@ class GamesAPI(Resource):
         self.reqparse.add_argument('token', type=str, location='json')
         super(GamesAPI, self).__init__()
 
-    @marshal_with(game_fields) # will need to switch back to marshal
+    @ratelimit(request_limit = 100, time_interval = 300)
     def get(self):
-        return Game.query.all()
+        return jsonify( [ marshal(game, game_fields) for game in Game.query.all() ] )
 
-    # @ratelimit(limit=100, interval=60, shared_limit=True)
+    @ratelimit(request_limit = 100, time_interval = 300)
     def post(self):
         args = self.reqparse.parse_args(strict=True)
         abort_if_no_auth(args['token'])
@@ -52,10 +52,11 @@ class GameAPI(Resource):
         self.reqparse.add_argument('token', type=str, location='json')
         super(GameAPI, self).__init__()
 
-    @marshal_with(game_fields)
+    @ratelimit(request_limit = 100, time_interval = 300)
     def get(self, id):
-        return Game.query.get_or_404(id)
+        return jsonify( marshal(Game.query.get_or_404(id), game_fields) )
 
+    @ratelimit(request_limit = 100, time_interval = 300)
     def put(self, id):
         args = self.reqparse.parse_args(strict=True)
         abort_if_no_auth(args['token'])
@@ -66,6 +67,7 @@ class GameAPI(Resource):
 
         return {"result" : game.id}, 201
 
+    @ratelimit(request_limit = 100, time_interval = 300)
     def delete(self, id):
         args = self.reqparse.parse_args(strict=True)
         abort_if_no_auth(args['token'])
