@@ -1,17 +1,40 @@
 1. use postgres for db (DONE!!!)
-2. games, tags, categories (genres), platforms, ratings, creators
+2. tags, platforms, ratings
 3. 206 code for partial content, aka pagination
 4. Response class for api
 5. productschema of marshmellow for data serialization
-6. token based authentication
-7. rate limiting (use redis), althought it could be done with nginx config
-8. login_required for protecting resources 
-9. 429 err code for too many requests
+6. token based authentication (DONE!!!)
+7. rate limiting (use redis) (DONE!!!)
+8. login_required for protecting resources (DONE!!!)
+9. 429 err code for too many requests (DONE!!!)
 10. what is 400 for. POST /api/moives/<id> ans:bad request (DONE!!!)
 11. authentication with google
-12. finally test the api
+12. finally test the api (DONE!!!)
 
-blueprint, sqlalchemy, flask_restful, api, resources, itsdangerous, OAuth2.0, marshmellow
+Flask API "DON'Ts"
+1. DON'T use your version control system to version your APIs
+You'll just wind up with a bunch of incompatible code branches that you might not be able to merge.
+
+2. DON'T write endpoints you can't test
+Flask makes it easy to test your endpoints using signals, so you have no excuse.
+
+3. DON'T use lots of extensions
+For any application of sufficient complexity, you will outgrow your extensions. The one exception: when you write your own.
+
+Flask API "DOs"
+1. Implement API versions as blueprints
+This way your compatibility-breaking changes are modularized and separated by url.
+
+2. Use signals and mocks for testing
+Signals and mocks make unit testing easy if you modularize your API carefully
+
+3. Use decorators as a code-reuse pattern
+Flask is flexible, so use decorators to abstract out reusable patterns.
+
+4.  Use Flask's custom error handler capability
+The one feature that nobody uses, but everyone should. You should almost never use abort in your API endpoints.
+
+OAuth2.0, marshmellow
 
 GET     /api/movies/        returns 200 # list all movies
 POST    /api/movies/        returns 201 # create a movie
@@ -19,9 +42,79 @@ GET     /api/movies/<id>    returns 200 # show a specific movie
 PUT     /api/movies/<id>    returns 201 # update a movie
 DELETE  /api/movies/<id>    returns 204 # delete a movie
 
-/profiles/{profileName}
-/messages/{messageId}
-
 /categories/{category_id}/games
 /games/{game_id}/categories
 /developer/{developer_id}/games
+
+>>> r.set('count',1)
+True
+>>> r.incr('count')
+2
+>>> r.incr('count')
+3
+>>> r.decr('count')
+2
+>>> r.get('count')
+b'2'
+
+use setex or expire or ttl
+
+def limit(requests=100, window=60, by="ip", group=None):
+    if not callable(by):
+        by = { 'ip': lambda: request.headers.remote_addr }[by]
+
+    def decorator(f):
+        @functools.wraps(f)
+        def wrapped(*args, **kwargs):
+            group = group or request.endpoint
+            key = ":".join(["rl", group, by()])
+
+            try:
+                remaining = requests - int(redis.get(key))
+            except (ValueError, TypeError):
+                remaining = requests
+                redis.set(key, 0)
+
+            ttl = redis.ttl(key)
+            if not ttl:
+                redis.expire(key, window)
+                ttl = window
+
+            g.view_limits = (requests,remaining-1,time()+ttl)
+
+            if remaining > 0:
+                redis.incr(key, 1)
+                return f(*args, **kwargs)
+            else:
+                return Response("Too Many Requests", 429)
+        return wrapped
+    return decorator
+
+@api.after_request
+def inject_rate_limit_headers(response):
+    try:
+        requests, remaining, reset = map(int, g.view_limits)
+    except (AttributeError, ValueError):
+        return response
+    else:
+        h = response.headers
+        h.add('X-RateLimit-Remaining', remaining)
+        h.add('X-RateLimit-Limit', requests)
+        h.add('X-RateLimit-Reset', reset)
+        return response
+
+
+
+class ValidationError(Exception):
+def __init__(self, field, message):
+    self.field = field
+    self.message = message
+
+@api.errorhandler(user.ValidationError)
+def handle_user_validation_error(error):
+    response = jsonify({
+        'msg': error.message,
+        'type': 'validation',
+        'field': error.field })
+    response.status_code = 400
+    return respons
