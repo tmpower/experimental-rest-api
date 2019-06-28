@@ -13,6 +13,7 @@
 .history
 
 ### virtualenv files ###
+todo.txt
 
 ### cache files ###
 *.pyc
