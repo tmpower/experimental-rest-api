@@ -15,7 +15,7 @@ from flask import jsonify, request
 import redis
 
 
-r = redis.StrictRedis(host='localhost', port=6379, db=0)
+r = redis.StrictRedis(host='redis', port=6379, db=0) # redis host from docker-compose.yml
 
 def ratelimit(request_limit=10, time_interval=60, shared_limit=True, key_prefix="rl"):
     def rate_limit_decorator(f):
