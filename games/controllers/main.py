@@ -11,6 +11,10 @@ main_blueprint = Blueprint(
 )
 
 
+@main_blueprint.route("/")
+def index():
+    return "Currently in Docker!"
+
 @main_blueprint.route("/put_games")
 def put_games():
     category1 = Category.query.get(1)
