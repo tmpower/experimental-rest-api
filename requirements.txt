@@ -7,6 +7,7 @@ Flask==1.0.3
 Flask-HTTPAuth==3.3.0
 Flask-RESTful==0.3.7
 Flask-SQLAlchemy==2.4.0
+gunicorn==19.0
 importlib-metadata==0.18
 isort==4.3.20
 itsdangerous==1.1.0
